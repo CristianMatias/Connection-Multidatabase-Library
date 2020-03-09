@@ -13,10 +13,12 @@ public class ComponenteBD implements java.io.Serializable{
     public static final int ORACLE = 3;
     public static final int JPA = 4;
     public static final int JDO = 5;
+    public static final int MONGO = 6;
     private static ConsultasSQL sql;
     private static ConsultasXML xml;
     private static ConsultasJPA jpa;
     private static ConsultasJDO jdo;
+    private static ConsultasMongoDB mongo;
     private String BD;
     private String usuario;
     private String contraseña;
@@ -84,6 +86,9 @@ public class ComponenteBD implements java.io.Serializable{
                 case JDO:
                     jdo = new ConsultasJDO();
                     return jdo.connect(BD);
+                case MONGO:
+                    mongo = new ConsultasMongoDB();
+                    return mongo.connect(BD, ip, puerto);
                 default: return false;
             }
         }catch(ClassNotFoundException ex){
@@ -91,6 +96,9 @@ public class ComponenteBD implements java.io.Serializable{
         } 
     }
     
+    public ArrayList<Object> listCollections(){
+        return mongo.queryListConnections();
+    }
     
     public ArrayList<Object> query(String query) throws Exception{
         switch(modelo){
@@ -106,6 +114,10 @@ public class ComponenteBD implements java.io.Serializable{
                 return jdo.query(query);
         }
         return null;
+    }
+    
+    public ArrayList<Object> query(String campo, String query, String colection){
+        return mongo.query(campo, query, colection);
     }
     
     public boolean update(String query, int primaryKey, String newParametrer) throws Exception{
